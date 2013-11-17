@@ -19,4 +19,8 @@ public class Stack<T>
 	{
 		return storage.isEmpty();
 	}
+	public int getSize()
+	{
+		return storage.size();
+	}
 }

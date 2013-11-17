@@ -3,9 +3,12 @@ import java.lang.Math;
 
 public class Compute 
 {
-	int start;
+	public static final int MAX = 15;
+	public static final int MIN = 14;
+	public static final int SQRT = 13;
+	public static final int SUM = 12;
+	public static final int LETTER = 11;
 	private static final int OPERATOR = 10;
-	//private static final int NUMBER = 2;
 	
 	private static final int OP_BRACKET = 0;
 	private static final int CL_BRACKET = 1;
@@ -17,8 +20,7 @@ public class Compute
 	private static final int POINT = 7;
 	private static final int ILLEGAL_SYMBOL = 8; 
 	
-	
-	public int defineCorrectSymbol(String c)
+	private int defineCorrectSymbol(String c)
 	{
 		char Array[] = c.toCharArray();
 		for(int i = 0; i < c.length(); i++)
@@ -56,32 +58,142 @@ public class Compute
 		default:
 			return ILLEGAL_SYMBOL;
 		}
-	}//Function o define more general symbol class 
+	}//Function to define more general symbol class 
 	
-	public int getNextPosition(String str, int start)
+	
+	private int defineFunction(String str)
 	{
-		int result = start;
+		String symbol = new String();
+		String result = new String();
 		
-		for(int i = start; i<str.length() ;i++)
+		for(int i = 0; i < str.length(); i++)
 		{
-			if(defineSymbol(str.substring(i,i+1)) == NUM || defineSymbol(str.substring(i,i+1)) == POINT)
+			symbol = str.substring(i, i+1);
+			if(defineSymbol(symbol) == LETTER)
 			{
-				result++;
+				result = result + symbol;
 			}
 			else
 			{
-				if(result == start)
-				{
-					result = result + 1;
-				}
-				
 				break;
 			}
+		}
+		switch(result)
+		{
+		case "sum":
+			
+			return SUM;
+			
+		case "sqrt":
+			
+			return SQRT;
+			
+		case "min":
+			
+			return MIN;
+			
+		case "max":
+			
+			return MAX;
+		}
+		return ILLEGAL_SYMBOL;
+	}//new
+	
+	private int getNextPosition(String str, int start)
+	{
+		int result = start;
+		String symbol = new String();
+		String previous_symbol = new String();
+		
+		
+		for(int i = start; i < str.length(); i++)
+		{
+			symbol = str.substring(i, i+1);
+			switch(defineSymbol(symbol))
+			{
+			case NUM:
+				
+				if(defineSymbol(previous_symbol) == LETTER)
+				{
+					return result;
+				}
+				result++;
+				break;
+				
+			case POINT:
+				
+				if(defineSymbol(previous_symbol) == LETTER)
+				{
+					return result;
+				}
+				result++;
+				break;
+				
+			case LETTER:
+				
+				if(defineSymbol(previous_symbol) == NUM || defineSymbol(previous_symbol) == POINT)
+				{
+					return result;
+				}
+				result++;
+				break;
+				
+			case OP_BRACKET:
+				
+				if(defineSymbol(previous_symbol) == LETTER)
+				{
+					result = getFunctionPosition(str, result+1);
+					return result;
+				}
+				
+			case SPACE://Add support of "func (args...)" such note
+				
+				/*if(defineSymbol(previous_symbol) == LETTER)
+				{
+					
+				}*/
+				
+			default:
+				
+				if(result == start)//Check
+				{
+					return result+1;
+				}
+				return result;
+			}
+			
+			previous_symbol = symbol;
 		}
 		return result;
 	}
 	
-	public int defineSymbol(String c)
+	private int getFunctionPosition(String str, int start)
+	{
+		int bracket = 1;
+		int result = start;
+		String symbol = new String();
+		
+		for(int i = start; i < str.length(); i++)
+		{
+			symbol = str.substring(i, i+1);
+			if(bracket == 0)
+			{
+				break;
+			}
+			if(symbol.equals("("))
+			{
+				bracket++;
+			}
+			if(symbol.equals(")"))
+			{
+				bracket--;
+			}
+			result++;
+		}
+		return result;
+	}
+	
+	private int defineSymbol(String c)
 	{
 		char Array[] = c.toCharArray();
 		for(int i = 0; i < c.length(); i++)
@@ -98,6 +210,20 @@ public class Compute
 				break;
 			}
 		}
+		for(int i = 0; i < c.length(); i++)
+		{
+			if(!c.isEmpty() && (int)Array[i] >= 97 && (int)Array[i] <= 122)
+			{
+				if(i == (c.length()-1))
+				{
+					return LETTER;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}//new
 		switch(c)
 		{
 		case "+":
@@ -123,46 +249,6 @@ public class Compute
 		}
 	}//Correct
 	
-	public boolean bracket(String str)
-	{
-		char[] symbol = new char[1];
-		Stack<Character> st = new Stack<Character>();
-		for(int i = 0; ; i++)
-		{
-			try
-			{
-				str.getChars(i, i+1, symbol, 0);
-				if(symbol[0] != '(' && symbol[0] != ')')
-				{
-					continue;
-				}
-				if(symbol[0] == ')')
-				{
-					if(st.isEmpty())
-					{
-						System.out.println("No opening bracket before the closing one" + " on position " + (i+1));
-						return false;
-					}
-					if(st.peek() == '(')
-					{
-						st.pop();
-						continue;
-					}
-				}
-				st.push(symbol[0]);
-			}
-			catch(StringIndexOutOfBoundsException e)
-			{
-				break;
-			}
-		}
-		if(!st.isEmpty())
-		{
-			return false;
-		}
-		return true;
-	}//Requires correction
-	
 	public void iterateChar()
 	{
 		for(char c = 0; c < 128; c++)
@@ -173,76 +259,65 @@ public class Compute
 	
 	public boolean isCorrect(String str)
 	{
+		int brackets = 0;
 		int pos;
 		String symbol = new String();
 		String previous_symbol = new String("");
+		Stack<String> st = new Stack<String>();
 		
 		for(int i = 0; i < str.length(); i++)
 		{
 			pos = getNextPosition(str,i);
 			symbol = str.substring(i, pos);
+			i = pos - 1;
+			st.push(symbol);
 			
 			switch(defineCorrectSymbol(symbol))
 			{
-			case OP_BRACKET:
-				if(previous_symbol.equals("."))//You can't write like that if(symbol == "."). The result will be always false.
+			case NUM:
+				if(defineCorrectSymbol(previous_symbol) == NUM)
 				{
-					System.out.println("Point in front of the opening bracket " + (i+1) + " position");
-					return false;
+					System.out.println("Missing the operato between two operators " + (i+1) + " position");
+					break;
 				}
-				if(defineSymbol(previous_symbol) == NUM)
-				{
-					System.out.println("Missing the operator between the operand and the opening bracket " + (i+1) + " position");
-					return false;
-				}
-			case CL_BRACKET:
-				if(defineCorrectSymbol(previous_symbol) == OPERATOR)
-				{
-					System.out.println("Missing operand between the operator and the closing bracket " + (i+1) + " position");
-					return false;
-				}
-				if(previous_symbol.equals("."))
-				{
-					System.out.println("Point in front of the closing bracket " + (i+1) + " position");
-					return false;
-				}
+				break;
 			case OPERATOR:
 				if(defineCorrectSymbol(previous_symbol) == OPERATOR)
 				{
 					System.out.println("Illegal combination of operators " + (i+1) + " position");
-					return false;
+					break;
 				}
-				if(previous_symbol.equals("."))
+				break;
+			case OP_BRACKET:
+				brackets++;
+			case CL_BRACKET:
+				brackets--;
+				if(brackets < 0)
 				{
-					System.out.println("Point in front of the operator " + (i+1) + " position");
-					return false;
+					System.out.println("Missing opening bracket before the closing one " + (i+1) + " position");
 				}
-				if(defineCorrectSymbol(previous_symbol) == OP_BRACKET)
-				{
-					System.out.println("No operand between the opening bracket and  " + (i+1) + " position");
-					return false;
-				}
+				break;
 			case SPACE:
 				break;
 			}
-			
 			if(symbol != " ")
 			{
 				previous_symbol = symbol;
 			}
-			i = pos - 1;
 		}
 		return true;
 	}//Unfinished, do not forget to add redefinition of i in the end
 	
-	public String toReversePolishNotation(String str)
+	private Stack<String> toReversePolishNotation(String str)
 	{
+		int operands = 0;
+		int operators = 0;
 		int pos;
 		String symbol_next = new String();
 		String symbol = new String();
 		Stack<String> st = new Stack<String>();
-		String space = new String(" ");
-		String result = new String();
+		Stack<String> st_result = new Stack<String>();
+		
 		for(int i = 0; i < str.length(); i++)
 		{
 			pos = getNextPosition(str,i);
@@ -253,11 +328,14 @@ public class Compute
 			{
 			case NUM:
 				
-				result = result + symbol + space;
+				st_result.push(symbol);//new
+
+				operands++;
 				break;
 				
 			case PLUS_MINUS:
 				
+				operators++;
 				if(st.isEmpty() || defineSymbol(st.peek()) < PLUS_MINUS)
 				{
 					st.push(symbol);
@@ -270,7 +348,8 @@ public class Compute
 					while(defineSymbol(st.peek()) >= PLUS_MINUS)
 					{
 						symbol = st.pop();
-						result = result + symbol + space;
+						st_result.push(symbol);//new
+						
 						if(st.isEmpty())
 						{
 							break;
@@ -282,6 +361,7 @@ public class Compute
 				
 			case MULT_DIV:
 				
+				operators++;
 				if(st.isEmpty() || defineSymbol(st.peek()) < MULT_DIV)
 				{
 					st.push(symbol);
@@ -294,7 +374,8 @@ public class Compute
 					while(defineSymbol(st.peek()) >= MULT_DIV)
 					{
 						symbol = st.pop();//Присваивая массивы друг - другу на самом дле переопределяются ссылки
-						result = result + symbol + space;
+						st_result.push(symbol);//new
+						
 						if(st.isEmpty())
 						{
 							break;
@@ -307,6 +388,7 @@ public class Compute
 				
 			case POWER:
 				
+				operators++;
 				if(st.isEmpty() || defineSymbol(st.peek()) < POWER)
 				{
 					st.push(symbol);
@@ -318,7 +400,8 @@ public class Compute
 					while(defineSymbol(st.peek()) >= POWER)
 					{
 						symbol = st.pop();
-						result = result + symbol + space;
+						st_result.push(symbol);
+						
 						if(st.isEmpty())
 						{
 							break;
@@ -335,10 +418,22 @@ public class Compute
 				
 			case CL_BRACKET:
 				
+				if(st.peek().equals("-") && operators >= operands)
+				{
+					symbol = st_result.pop();
+					st_result.push(Double.toString(-Double.parseDouble(symbol)));
+					
+					
+					operators--;
+					st.pop();
+					symbol = st.pop();
+					break;
+				}//New segment
 				while(defineSymbol(st.peek()) != OP_BRACKET)
 				{
 					symbol = st.pop();
-					result = result + symbol + space;
+					st_result.push(symbol);
+					
 				}
 				symbol = st.pop();
 				
@@ -347,43 +442,65 @@ public class Compute
 			case SPACE:
 				
 				break;
+				
 			default:
 				break;
 			}
+			
+			switch(defineFunction(symbol))
+			{
+			case SUM:
+				st_result.push(Double.toString(calculateFunction(symbol)));
+				break;
+			case SQRT:
+				st_result.push(Double.toString(calculateFunction(symbol)));
+				break;
+			case MIN:
+				st_result.push(Double.toString(calculateFunction(symbol)));
+				break;
+			case MAX:
+				st_result.push(Double.toString(calculateFunction(symbol)));
+				break;
+			}
+			
 		}
 		
 		while(!st.isEmpty())
 		{
 			symbol = st.pop();
-			result = result + symbol + space;
+			st_result.push(symbol);
 		}
 		
-		return result;
+		while(!st_result.isEmpty())
+		{
+			st.push(st_result.pop());
+		}
+		
+		return st;
 	}
+	
+	
 	public double calculate(String str)
 	{
-		//int pointer = 0;
 		double number;
 		double operand = 0;
 		
-		int pos;
+		Stack<String> st_result = toReversePolishNotation(str); 
 		
-		String reverse_polish_notation;
-		reverse_polish_notation = toReversePolishNotation(str);
 		Stack<Double> st = new Stack<Double>();
 		
-		for(int i = 0; i < reverse_polish_notation.length(); i++)
+		while(!st_result.isEmpty())
 		{
-			
-			pos = getNextPosition(reverse_polish_notation,i);
-			if(defineSymbol(reverse_polish_notation.substring(i, pos)) != SPACE && defineSymbol(reverse_polish_notation.substring(i, pos)) == NUM)
+			try
 			{
-				number = Double.parseDouble(reverse_polish_notation.substring(i, pos));
+				number = Double.parseDouble(st_result.peek());
 				st.push(number);
+				st_result.pop();
+				continue;
 			}
-			else
+			catch(NumberFormatException E)
 			{
-				switch(reverse_polish_notation.substring(i, pos))
+				switch(st_result.pop())
 				{
 				case "+":
 					operand = st.pop();
@@ -409,14 +526,149 @@ public class Compute
 					number = Math.pow(st.pop(), power);
 					st.push(number);
 					break;
-				default:
+				default: 
 					break;
 				}
 			}
-			i = pos -1;
 		}
 		return st.pop();
 	}
 	
-
+	private double calculateFunction(String str)
+	{
+		int pos;
+		double result = 0;
+		String symbol = new String();
+		
+		for(int i = 0; i< str.length(); i++)
+		{
+			pos = getNextPosition(str, i);
+			symbol = str.substring(i, pos);
+			i = pos - 1;
+			
+			switch(defineFunction(symbol))
+			{
+			case SUM:
+				
+				for(int j = 0; j < str.length(); j++)
+				{
+					if(defineSymbol(str.substring(j, j+1)) == LETTER)
+					{
+						continue;
+					}
+					pos = getArgument(str,j+1);
+					symbol = str.substring(j+1, pos);
+					if(symbol.equals(""))
+					{
+						break;
+					}
+					result = result + calculate(symbol);
+					j = pos - 1;
+				}
+				break;
+				
+			case SQRT:
+				
+				for(int j = 0; j < str.length(); j++)
+				{
+					if(defineSymbol(str.substring(j, j+1)) == LETTER)
+					{
+						continue;
+					}
+					pos = getArgument(str,j+1);
+					symbol = str.substring(j+1, pos);
+					result = Math.pow(calculate(symbol), 0.5);
+					break;
+				}
+				break;
+				
+			case MIN:
+				
+				double min = Double.MAX_VALUE;
+				for(int j = 0; j < str.length(); j++)
+				{
+					if(defineSymbol(str.substring(j, j+1)) == LETTER)
+					{
+						continue;
+					}
+					pos = getArgument(str, j+1);
+					symbol = str.substring(j+1, pos);
+					j = pos - 1;
+					if(symbol.equals(""))
+					{
+						break;
+					}
+					result = calculate(symbol);
+					
+					if(result < min)
+					{
+						min = result;
+					}
+				}
+				
+				result = min;
+				
+				break;
+			case MAX:
+				
+				double max = Double.MIN_VALUE;
+				for(int j = 0; j < str.length(); j++)
+				{
+					if(defineSymbol(str.substring(j, j+1)) == LETTER)
+					{
+						continue;
+					}
+					pos = getArgument(str, j+1);
+					symbol = str.substring(j+1, pos);
+					j = pos - 1;
+					if(symbol.equals(""))
+					{
+						break;
+					}
+					result = calculate(symbol);
+					
+					if(result > max)
+					{
+						max = result;
+					}
+				}
+				
+				result = max;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	private int getArgument(String str, int start)
+	{
+		int bracket = 1;
+		int pos;
+		int result = start;
+		String symbol = new String();
+		
+		for(int i = start; i < str.length(); i++)
+		{
+			symbol = str.substring(i, i+1);
+			
+			pos = getNextPosition(str, i);
+			result = pos;
+			symbol = str.substring(i, i+1);
+			i = pos - 1;
+			if(symbol.equals("("))
+			{
+				bracket++;
+			}
+			if(symbol.equals(")"))
+			{
+				bracket--;
+			}
+			if(symbol.equals(",") || (symbol.equals(")") && bracket == 0))
+			{
+				result--;
+				break;
+			}
+		}
+		return result;
+	}
 }
