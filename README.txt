@@ -1,6 +1,5 @@
 This repository contains the interpreter of math expresions.
 It still does not have the function which would check correction of expression.
-Tests will be wriiten as soon as posible.
  
 Supporting operators:
 +

@@ -8,7 +8,7 @@ public class Compute
 	public static final int SQRT = 13;
 	public static final int SUM = 12;
 	public static final int LETTER = 11;
-	private static final int OPERATOR = 10;
+	//private static final int OPERATOR = 10;
 	
 	private static final int OP_BRACKET = 0;
 	private static final int CL_BRACKET = 1;
@@ -20,45 +20,7 @@ public class Compute
 	private static final int POINT = 7;
 	private static final int ILLEGAL_SYMBOL = 8; 
 	
-	private int defineCorrectSymbol(String c)
-	{
-		char Array[] = c.toCharArray();
-		for(int i = 0; i < c.length(); i++)
-		{
-			if(!c.isEmpty() && (int)Array[i] >= 48 && (int)Array[i] <= 57 || (int)Array[i] == 46)
-			{
-				if(i == (c.length()-1))
-				{
-					return NUM;
-				}
-			}
-			else
-			{
-				break;
-			}
-		}
-		switch(c)
-		{
-		case "+":
-			return OPERATOR;
-		case "-":
-			return OPERATOR;
-		case "*":
-			return OPERATOR;
-		case "/":
-			return OPERATOR;
-		case "^":
-			return OPERATOR;
-		case " ":
-			return SPACE;
-		case "(":
-			return OP_BRACKET;
-		case ")":
-			return CL_BRACKET;
-		default:
-			return ILLEGAL_SYMBOL;
-		}
-	}//Function to define more general symbol class 
+	
 	
 	
 	private int defineFunction(String str)
@@ -257,12 +219,11 @@ public class Compute
 		}
 	}//Correct
 	
-	public boolean isCorrect(String str)
+	/*public boolean isCorrect(String str)
 	{
 		int brackets = 0;
 		int pos;
 		String symbol = new String();
-		String previous_symbol = new String("");
 		Stack<String> st = new Stack<String>();
 		
 		for(int i = 0; i < str.length(); i++)
@@ -272,41 +233,25 @@ public class Compute
 			i = pos - 1;
 			st.push(symbol);
 			
-			switch(defineCorrectSymbol(symbol))
+			switch(defineSymbol(symbol))
 			{
-			case NUM:
-				if(defineCorrectSymbol(previous_symbol) == NUM)
+			case MULT_DIV:
+				if(defineSymbol(st.peek()) == OP_BRACKET)
 				{
-					System.out.println("Missing the operato between two operators " + (i+1) + " position");
-					break;
+					System.out.println("Missing operand on position " + i);
+					return false;
+				}
+				if(defineSymbol(st.peek()) == POINT)
+				{
+					
 				}
 				break;
-			case OPERATOR:
-				if(defineCorrectSymbol(previous_symbol) == OPERATOR)
-				{
-					System.out.println("Illegal combination of operators " + (i+1) + " position");
-					break;
-				}
-				break;
-			case OP_BRACKET:
-				brackets++;
-			case CL_BRACKET:
-				brackets--;
-				if(brackets < 0)
-				{
-					System.out.println("Missing opening bracket before the closing one " + (i+1) + " position");
-				}
-				break;
-			case SPACE:
-				break;
+			case 
 			}
-			if(symbol != " ")
-			{
-				previous_symbol = symbol;
-			}
+			
 		}
 		return true;
-	}//Unfinished, do not forget to add redefinition of i in the end
+	}*///Unfinished, do not forget to add redefinition of i in the end, incorrect
 	
 	private Stack<String> toReversePolishNotation(String str)
 	{
