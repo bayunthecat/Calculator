@@ -1,10 +1,10 @@
 import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 
 public class ComputeTest 
 {
+	GraphicInterface gi = new GraphicInterface();
 	Compute com = new Compute();
 	
 	@Test
@@ -43,5 +43,17 @@ public class ComputeTest
 	{
 		assertEquals(4,com.calculate("sqrt(16)"),0);
 	}
-
+	
+	@Test
+	public void testIsCorrect() //Testing isCorrect function
+	{
+		assertEquals(1,gi.isCorrect("2(2+3)"),0);
+		assertEquals(3,gi.isCorrect("2*(+3)"),0);
+		assertEquals(1,gi.isCorrect("2(2+3)"),0);
+		assertEquals(6,gi.isCorrect("2*sut()"),0);
+		assertEquals(7,gi.isCorrect("2*(2+3)4"),0);
+		assertEquals(7,gi.isCorrect("2*(2+3)4"),0);
+		assertEquals(5,gi.isCorrect("2*()(("),0);
+		assertEquals(4,gi.isCorrect("2^()))"),0);
+	}
 }

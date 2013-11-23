@@ -10,20 +10,20 @@ public class Compute
 	public static final int LETTER = 11;
 	//private static final int OPERATOR = 10;
 	
-	private static final int OP_BRACKET = 0;
-	private static final int CL_BRACKET = 1;
-	private static final int PLUS_MINUS = 2;
-	private static final int MULT_DIV = 3;
-	private static final int POWER = 4;
-	private static final int SPACE = 5;
-	private static final int NUM = 6;
-	private static final int POINT = 7;
-	private static final int ILLEGAL_SYMBOL = 8; 
+	public static final int OP_BRACKET = 0;
+	public static final int CL_BRACKET = 1;
+	public static final int PLUS_MINUS = 2;
+	public static final int MULT_DIV = 3;
+	public static final int POWER = 4;
+	public static final int SPACE = 5;
+	public static final int NUM = 6;
+	public static final int POINT = 7;
+	public static final int ILLEGAL_SYMBOL = 8; 
 	
 	
 	
 	
-	private int defineFunction(String str)
+	public int defineFunction(String str)
 	{
 		String symbol = new String();
 		String result = new String();
@@ -61,7 +61,7 @@ public class Compute
 		return ILLEGAL_SYMBOL;
 	}//new
 	
-	private int getNextPosition(String str, int start)
+	public int getNextPosition(String str, int start)
 	{
 		int result = start;
 		String symbol = new String();
@@ -129,7 +129,7 @@ public class Compute
 		return result;
 	}
 	
-	private int getFunctionPosition(String str, int start)
+	public int getFunctionPosition(String str, int start)
 	{
 		int bracket = 1;
 		int result = start;
@@ -155,7 +155,7 @@ public class Compute
 		return result;
 	}
 	
-	private int defineSymbol(String c)
+	public int defineSymbol(String c)
 	{
 		char Array[] = c.toCharArray();
 		for(int i = 0; i < c.length(); i++)
@@ -219,41 +219,9 @@ public class Compute
 		}
 	}//Correct
 	
-	/*public boolean isCorrect(String str)
-	{
-		int brackets = 0;
-		int pos;
-		String symbol = new String();
-		Stack<String> st = new Stack<String>();
-		
-		for(int i = 0; i < str.length(); i++)
-		{
-			pos = getNextPosition(str,i);
-			symbol = str.substring(i, pos);
-			i = pos - 1;
-			st.push(symbol);
-			
-			switch(defineSymbol(symbol))
-			{
-			case MULT_DIV:
-				if(defineSymbol(st.peek()) == OP_BRACKET)
-				{
-					System.out.println("Missing operand on position " + i);
-					return false;
-				}
-				if(defineSymbol(st.peek()) == POINT)
-				{
-					
-				}
-				break;
-			case 
-			}
-			
-		}
-		return true;
-	}*///Unfinished, do not forget to add redefinition of i in the end, incorrect
+//Unfinished, do not forget to add redefinition of i in the end, incorrect
 	
-	private Stack<String> toReversePolishNotation(String str)
+	public Stack<String> toReversePolishNotation(String str)
 	{
 		int operands = 0;
 		int operators = 0;
@@ -421,9 +389,20 @@ public class Compute
 			st.push(st_result.pop());
 		}
 		
+
 		return st;
 	}
 	
+	public String getRevPolNot(Stack<String> st)
+	{
+		String result = new String();
+		
+		while(!st.isEmpty())
+		{
+			result = result + st.pop() + " "; 
+		}
+		return result;
+	}
 	
 	public double calculate(String str)
 	{
@@ -479,7 +458,7 @@ public class Compute
 		return st.pop();
 	}
 	
-	private double calculateFunction(String str)
+	public double calculateFunction(String str)
 	{
 		int pos;
 		double result = 0;
@@ -585,7 +564,7 @@ public class Compute
 		return result;
 	}
 	
-	private int getArgument(String str, int start)
+	public int getArgument(String str, int start)
 	{
 		int bracket = 1;
 		int pos;

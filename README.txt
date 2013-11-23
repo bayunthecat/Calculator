@@ -1,5 +1,4 @@
 This repository contains the interpreter of math expresions.
-It still does not have the function which would check correction of expression.
  
 Supporting operators:
 +
@@ -24,7 +23,3 @@ Example: 1 + sqrt(16) + sum(4+3,sqrt(81))
 
 Note: Functions that were written with the gap between the name and 
 the oppening bracket will not be properly calculated. (Will be fixed soon)
-
-
-
-This version has the pilot version of graphic interface.
